@@ -20,12 +20,10 @@ Frontend của nền tảng kết nối khách hàng với kỹ thuật viên IT
 src/
  ├── assets/        # images, icons, fonts
  ├── components/    # reusable UI components
- ├── layouts/       # layout (navbar, footer)
  ├── pages/         # application screens
  ├── services/      # API calls / business logic
  ├── hooks/         # custom React hooks
  ├── types/         # TypeScript types/interfaces
-
  ├── App.tsx        # root component
  ├── main.tsx       # entry point
  └── index.css      # global styles (Tailwind)
