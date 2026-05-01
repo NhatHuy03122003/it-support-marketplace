@@ -14,7 +14,11 @@ export default function Layout({ children }: LayoutProps) {
             Bác sĩ Công nghệ
           </div>
           <nav id="header-nav" className="hidden md:flex gap-6 items-center">
-            <a id="nav-register" href="#" className="text-[#0050cb] font-semibold hover:opacity-80 transition-opacity">
+            <a id="nav-register" href="/login" className="text-slate-600 hover:text-[#0050cb] transition-color">
+              Đăng nhập
+            </a>
+            <p>|</p>
+            <a id="nav-register" href="/register" className="text-slate-600 hover:text-[#0050cb] transition-color">
               Đăng ký
             </a>
             <a id="nav-help" href="#" className="text-slate-600 hover:text-[#0050cb] transition-colors">
