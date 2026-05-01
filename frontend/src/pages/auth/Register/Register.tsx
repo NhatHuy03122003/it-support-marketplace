@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Header } from "../../../components/Header/Header";
-import { Footer } from "../../../components/Footer/Footer";
-import { FormField } from "./components/FormField/FormField";
-import { UserTypeSelector } from "./components/UserTypeSelector/UserTypeSelector";
-import useRegister from "./useRegister";
+import { Header } from "../../../components/layout/Header";
+import { Footer } from "../../../components/layout/Footer";
+import { FormField } from "./components/FormField";
+import { UserTypeSelector } from "./components/UserTypeSelector";
+import useRegister from "../../../hooks/useRegister";
 
-interface RegistrationPageProps {}
+interface RegistrationPageProps { }
 
 const RegistrationPage: React.FC<RegistrationPageProps> = () => {
   const { agreedToTerms, setAgreedToTerms } = useRegister();
