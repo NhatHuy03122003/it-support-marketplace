@@ -9,36 +9,48 @@ const REFRESH_TOKEN_TTL = 14 * 24 * 60 * 60; // 14 days in seconds
 
 export const signUp = async (req, res) => {
     try {
-        const { username, password, email, firstName, lastName } = req.body;
+        const { fullname, password, email, role, phone } = req.body;
 
-        if (!username || !password || !email || !firstName || !lastName) {
-            return res
-                .status(400)
-                .json({
-                    message: "Indispensable username, password, email, first name and last name"
-                });
+        if (!fullname || !password || !email || !phone) {
+            return res.status(400).json({
+                message: "Missing required fields"
+            });
         }
 
-        //Check if the username exists 
-        const duplicate = await User.findOne({ username })
+        //Check if the email exists 
+        const duplicate = await User.findOne({ email })
         if (duplicate) {
-            return res.status(409).json({ message: "Username already exists" });
+            return res.status(409).json({ message: "Email already exists" });
         }
 
         //password encryption
-
         const hashedPassword = await bcrypt.hash(password, 10); // salt rounds = 10
+
+        // role 
+        let finalRole = "customer";
+
+        if (role === "expert") {
+            finalRole = "expert";
+        }
+
+        // phone 
+        const phoneExists = await User.findOne({ phone });
+        if (phoneExists) {
+            return res.status(409).json({ message: "Phone already exists" });
+        }
 
         // creat new user
         await User.create({
-            username,
+            fullname,
             hashedPassword,
             email,
-            displayName: `${firstName} ${lastName}`
+            phone,
+            role: finalRole,
+            status: finalRole === "expert" ? "pending" : "active"
         });
 
         //return 
-        return res.sendStatus(204)
+        return res.status(201).json({ message: "User created successfully" });
     } catch (error) {
         console.error("Error in signUp:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -48,26 +60,30 @@ export const signUp = async (req, res) => {
 export const signIn = async (req, res) => {
     try {
         // get inputs
-        const { username, password } = req.body;
-        if (!username || !password) {
-            return res.status(400).json({ message: "Username and password are required" });
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
         }
 
         // compare hashedPassword from database with input password
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: "username or password is incorrect" });
+            return res.status(401).json({ message: "Email or password is incorrect" });
         }
 
         //check password
         const passwordCorrect = await bcrypt.compare(password, user.hashedPassword);
         if (!passwordCorrect) {
-            return res.status(401).json({ message: "username or password is incorrect" });
+            return res.status(401).json({ message: "Email or password is incorrect" });
         }
 
         // if matched, generate accessToken using JWT
         const accessToken = jwt.sign(
-            { userId: user._id },
+            {
+                userId: user._id,
+                role: user.role,
+                status: user.status
+            },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "15m" }
         );
@@ -91,10 +107,29 @@ export const signIn = async (req, res) => {
         });
 
         // return the access token in the response
-        return res.json({ message: `User ${user.displayName} signed in successfully`, accessToken });
+        return res.json({ message: `User ${user.fullname} signed in successfully`, accessToken });
 
     } catch (error) {
         console.error("Error in signIn:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const signOut = async (req, res) => {
+    try {
+        /// get refresh token from cookie
+        const token = req.cookies?.refreshToken;
+
+        if (token) {
+            // delete session with the refresh token
+            await Session.deleteOne({ refreshToken: token });
+
+            // clear cookie
+            res.clearCookie("refreshToken");
+        }
+        return res.sendStatus(204);
+    } catch (error) {
+        console.error("Error in signOut:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 };

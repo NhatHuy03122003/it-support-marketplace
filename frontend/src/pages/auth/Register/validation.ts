@@ -1,16 +1,20 @@
-import { object, ref, string } from "yup";
+import { z } from "zod";
 
-const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-
-export const validationSchema = object().shape({
-  fullname: string().required("Họ tên không được bỏ trống").trim(),
-  email: string()
-    .required("Email không được để trống")
-    .trim()
-    .matches(emailRegex, "Email không đúng định dạng"),
-  password: string().trim().required("Mật khẩu không được bỏ trống"),
-  confirmPassword: string()
-    .trim()
-    .required("Xác nhận mật khẩu không thể bỏ trống")
-    .oneOf([ref("password")], "Phải trùng khớp với mật khẩu đã nhập"),
+export const registerSchema = z.object({
+  fullname: z.string().min(1, "Họ tên bắt buộc phải có "),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+  phone: z
+    .string()
+    .transform((val) => val.replace(/\s+/g, ""))
+    .refine((val) => /^[0-9]+$/.test(val), {
+      message: "Số điện thoại chỉ được chứa số",
+    })
+    .refine((val) => val.length >= 9 && val.length <= 11, {
+      message: "Số điện thoại không hợp lệ",
+    }),
+  terms: z.boolean().refine((val) => val === true, {
+    message: "Bạn phải đồng ý với điều khoản sử dụng",
+  }),
 });
+export type SignUpFormValues = z.infer<typeof registerSchema>;

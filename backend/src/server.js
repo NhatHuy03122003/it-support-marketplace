@@ -1,23 +1,29 @@
 import express from "express";
 import dotenv from "dotenv"
-import authRoutes from "./routes/authRouter.js";
+import authRoute from "./routes/authRoute.js";
 import { connectDB } from "./config/db.js";
+import cookieParser from "cookie-parser";
+import { protectedRoute } from "./middlewares/authMiddleware.js";
+import cors from "cors";
+
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // Public Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoute);
 
-// Test route
-app.get("/", (req, res) => {
-    res.send("Server is running 🚀");
-});
-
+// private routes
+app.use(protectedRoute);
 
 connectDB().then(() => {
     // Start server

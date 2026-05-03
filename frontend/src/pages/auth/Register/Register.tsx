@@ -2,10 +2,36 @@
 import { useState } from "react";
 import { User, Stethoscope, Eye, EyeOff, Check } from "lucide-react";
 import { motion } from "motion/react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type SignUpFormValues } from "./validation";
+import { useAuthStore } from "../../../stores/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 export default function RegistrationForm() {
-  const [role, setRole] = useState<"client" | "expert">("client");
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState<"client" | "expert">("client");
+  const { signUp } = useAuthStore();
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpFormValues>({
+    resolver: zodResolver(registerSchema)
+  });
+
+  const onSubmit = async (data: SignUpFormValues) => {
+    try {
+      const { fullname, email, phone, password } = data;
+      // Map frontend role to backend role
+      const backendRole = role === "client" ? "customer" : role;
+
+      await signUp(fullname, password, email, phone, backendRole);
+      // Only navigate if registration succeeds
+      navigate("/login");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      // Don't navigate on error - user stays on registration page
+      // Additional error context could be added here if needed
+    }
+  }
 
   return (
     <motion.div
@@ -59,7 +85,7 @@ export default function RegistrationForm() {
         <form
           id="sign-up-form"
           className="space-y-4"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit(onSubmit)}
         >
           {/* Role Selection */}
           <div id="role-selection" className="grid grid-cols-2 gap-3">
@@ -67,11 +93,10 @@ export default function RegistrationForm() {
               id="role-client"
               type="button"
               onClick={() => setRole("client")}
-              className={`flex flex-col items-center p-3 border-2 rounded-xl transition-all duration-200 group ${
-                role === "client"
-                  ? "border-[#0050cb] bg-[#0050cb]/5 text-[#0050cb]"
-                  : "border-slate-100 bg-slate-50 text-slate-400 hover:bg-slate-100"
-              }`}
+              className={`flex flex-col items-center p-3 border-2 rounded-xl transition-all duration-200 group ${role === "client"
+                ? "border-[#0050cb] bg-[#0050cb]/5 text-[#0050cb]"
+                : "border-slate-100 bg-slate-50 text-slate-400 hover:bg-slate-100"
+                }`}
             >
               <User
                 id="icon-client"
@@ -85,11 +110,10 @@ export default function RegistrationForm() {
               id="role-expert"
               type="button"
               onClick={() => setRole("expert")}
-              className={`flex flex-col items-center p-3 border-2 rounded-xl transition-all duration-200 group ${
-                role === "expert"
-                  ? "border-[#0050cb] bg-[#0050cb]/5 text-[#0050cb]"
-                  : "border-slate-100 bg-slate-50 text-slate-400 hover:bg-slate-100"
-              }`}
+              className={`flex flex-col items-center p-3 border-2 rounded-xl transition-all duration-200 group ${role === "expert"
+                ? "border-[#0050cb] bg-[#0050cb]/5 text-[#0050cb]"
+                : "border-slate-100 bg-slate-50 text-slate-400 hover:bg-slate-100"
+                }`}
             >
               <Stethoscope
                 id="icon-expert"
@@ -114,7 +138,13 @@ export default function RegistrationForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#0050cb] outline-none bg-[#faf8ff] text-sm"
                 placeholder="Nguyễn Văn A"
                 type="text"
+                {...register("fullname")}
               />
+              {errors.fullname && (
+                <p className="text-red-500 text-sm">
+                  {errors.fullname.message}
+                </p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -124,7 +154,13 @@ export default function RegistrationForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#0050cb] outline-none bg-[#faf8ff] text-sm"
                 placeholder="example@clinic.com"
                 type="email"
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -134,7 +170,13 @@ export default function RegistrationForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#0050cb] outline-none bg-[#faf8ff] text-sm"
                 placeholder="090 123 4567"
                 type="tel"
+                {...register("phone")}
               />
+              {errors.phone && (
+                <p className="text-red-500 text-sm">
+                  {errors.phone.message}
+                </p>
+              )}
             </div>
             <div className="space-y-1">
               <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -145,6 +187,7 @@ export default function RegistrationForm() {
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#0050cb] outline-none bg-[#faf8ff] text-sm pr-10"
                   placeholder="••••••••"
                   type={showPassword ? "text" : "password"}
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -154,6 +197,11 @@ export default function RegistrationForm() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -163,6 +211,7 @@ export default function RegistrationForm() {
                 id="checkbox-terms"
                 className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 checked:bg-[#0050cb]"
                 type="checkbox"
+                {...register("terms")}
               />
               <Check className="absolute left-0 h-5 w-5 text-white opacity-0 peer-checked:opacity-100 pointer-events-none p-1" />
             </div>
@@ -176,18 +225,24 @@ export default function RegistrationForm() {
               </a>{" "}
               sử dụng dịch vụ.
             </label>
+            {errors.terms && (
+              <p className="text-red-500 text-xs">
+                {errors.terms.message}
+              </p>
+            )}
           </div>
 
           <button
             className="w-full py-3.5 bg-[#0050cb] text-white font-bold rounded-full hover:bg-[#003fa4] transition-all text-sm uppercase tracking-widest"
             type="submit"
+            disabled={isSubmitting}
           >
             Đăng ký
           </button>
 
           <p className="text-center text-xs font-medium text-slate-500">
             Đã có tài khoản?{" "}
-            <a className="text-[#0050cb] font-bold" href="#">
+            <a className="text-[#0050cb] font-bold" href="/login">
               Đăng nhập
             </a>
           </p>
