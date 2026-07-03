@@ -61,12 +61,15 @@ export const signIn = async (req, res) => {
     try {
         // get inputs
         const { email, password } = req.body;
+        console.log(req.body);
+        
         if (!email || !password) {
             return res.status(400).json({ message: "Email and password are required" });
         }
 
         // compare hashedPassword from database with input password
         const user = await User.findOne({ email });
+        
         if (!user) {
             return res.status(401).json({ message: "Email or password is incorrect" });
         }
@@ -82,6 +85,7 @@ export const signIn = async (req, res) => {
             {
                 userId: user._id,
                 role: user.role,
+                fullname:user.fullname,
                 status: user.status
             },
             process.env.ACCESS_TOKEN_SECRET,

@@ -1,16 +1,18 @@
 // src/components/Layout.tsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const navigate = useNavigate();
   return (
     <div id="layout-root" className="h-screen flex flex-col overflow-hidden bg-[#F8FAFC]">
       <header id="app-header" className="flex-none z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50 shadow-sm">
         <div id="header-container" className="flex justify-between items-center px-6 h-16 max-w-7xl mx-auto">
-          <div id="logo" className="text-xl font-extrabold tracking-tight text-[#0050cb]">
+          <div onClick={()=>navigate("/")} id="logo" className="text-xl font-extrabold tracking-tight text-[#0050cb]">
             Bác sĩ Công nghệ
           </div>
           <nav id="header-nav" className="hidden md:flex gap-6 items-center">
