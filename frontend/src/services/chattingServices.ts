@@ -1,8 +1,8 @@
 import api from "../lib/axios";
 
 const chattingServices = {
-  getConversations: async () => {
-    const response = await api.get("/chat/conversations", {
+  getConversations: async (userId:string) => {
+    const response = await api.get(`/chat/conversations/${userId}`, {
       withCredentials: true,
     });
     return response.data;

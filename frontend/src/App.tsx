@@ -5,8 +5,26 @@ import Layout from "./components/layout/AuthLayout";
 import HomePage from "./pages/home/Home";
 import { Toaster } from "sonner";
 import Chat from "./pages/Chat";
+import { useChattingStore } from "./stores/useChattingStore";
+import { useAuthStore } from "./stores/useAuthStore";
+import { useCallback, useEffect } from "react";
 
 function App() {
+  const {connectSocket,disconnectSocket,getConversations} = useChattingStore();
+  const {user} = useAuthStore(); 
+  //Check user online
+  const getConversationsData = useCallback(async () => {
+      if (user) await getConversations(user?.userId);
+    }, []);
+  useEffect(() => {
+  if (user) {
+    connectSocket(user.userId);
+    getConversationsData();
+  }
+  return () => {
+    disconnectSocket();
+  };
+}, [user?.userId]);
   return (
     <>
       <Toaster richColors />

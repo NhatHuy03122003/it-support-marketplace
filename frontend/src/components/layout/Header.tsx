@@ -11,36 +11,8 @@ import { useAuthStore } from "../../stores/useAuthStore";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-
-const experts = [
-  {
-    id: 1,
-    name: "Dr. Minh Nguyễn",
-    time: "12:45 PM",
-    msg: "Vấn đề card màn hình của anh đã được...",
-    avatar:
-      "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=150&h=150",
-    online: true,
-  },
-  {
-    id: 2,
-    name: "Eng. Linh Trần",
-    time: "10:20 AM",
-    msg: "Anh đã kiểm tra lại driver chưa ạ?",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150",
-    online: true,
-  },
-  {
-    id: 3,
-    name: "Tech. Hoàng Phạm",
-    time: "Hôm qua",
-    msg: "Dạ, cấu hình này tối ưu nhất rồi đó.",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
-    online: false,
-  },
-];
+import { useChattingStore } from "../../stores/useChattingStore";
+import type { Conversation } from "../../types/chatting";
 
 const ComponentRightBeforeLogin = () => (
   <>
@@ -65,7 +37,9 @@ export function Header({ onOpenChat }: { onOpenChat: () => void }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  const { conversations, joinConversation } = useChattingStore();
+  const { user } = useAuthStore();
+  const infoUserOther = (conversation: Conversation) => (conversation.participants.filter(item => item._id != user?.userId)[0]);
   const onClickSeeAllChats = () => {
     setIsChatOpen(false);
     navigate("/chat");
@@ -80,6 +54,10 @@ export function Header({ onOpenChat }: { onOpenChat: () => void }) {
       console.error("Logout failed:", error);
     }
   };
+  const onClickConversation = (conversation:Conversation)=>{
+    joinConversation(conversation._id);
+    navigate('/chat');
+  }
   return (
     <header className="fixed top-0 w-full z-50 glass border-b border-slate-200/60">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -87,14 +65,14 @@ export function Header({ onOpenChat }: { onOpenChat: () => void }) {
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <BriefcaseMedical size={24} fill="currentColor" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-blue-700">
+          <span onClick={() => navigate("/")} className="text-xl font-bold tracking-tight text-blue-700 cursor-pointer">
             Bác sĩ Công nghệ
           </span>
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
           <a
-            href="#"
+            href="/"
             className="text-blue-600 font-medium border-b-2 border-blue-600 pb-1"
           >
             Trang chủ
@@ -160,36 +138,39 @@ export function Header({ onOpenChat }: { onOpenChat: () => void }) {
                       </div>
 
                       <div className="max-h-[420px] overflow-y-auto bg-white/50">
-                        {experts.map((expert) => (
+                        {conversations ? conversations.map((conv) => (
                           <div
-                            key={expert.id}
+                            key={conv._id}
+                            onClick={()=>onClickConversation(conv)}
                             className="flex items-center gap-4 px-5 py-4 hover:bg-slate-50 transition-colors cursor-pointer group"
                           >
                             <div className="relative flex-shrink-0">
                               <img
-                                src={expert.avatar}
-                                alt={expert.name}
+                                src="https://jbagy.me/wp-content/uploads/2025/03/Hinh-anh-avatar-dragon-ball-super-cool-ngau-5.jpg"
+                                alt={infoUserOther(conv).fullname}
                                 className="w-12 h-12 rounded-full object-cover border border-slate-100"
                               />
                               <div
-                                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${expert.online ? "bg-green-500" : "bg-slate-300"}`}
+                                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${infoUserOther(conv).status === "active" ? "bg-green-500" : "bg-slate-300"}`}
                               ></div>
                             </div>
                             <div className="flex-1 min-w-0 text-left">
                               <div className="flex justify-between items-baseline">
                                 <h4 className="font-semibold text-sm text-slate-800 truncate">
-                                  {expert.name}
+                                  {infoUserOther(conv).fullname}
                                 </h4>
                                 <span className="text-[10px] text-slate-400 font-medium">
-                                  {expert.time}
+                                  {conv.updatedAt}
                                 </span>
                               </div>
                               <p className="text-xs text-slate-500 truncate mt-0.5">
-                                {expert.msg}
+                                {conv.lastMessage.content}
                               </p>
                             </div>
                           </div>
-                        ))}
+                        )) : <span className="text-sm text-slate-400">
+                          Không có cuộc hội thoại nào gần đây
+                        </span>}
                       </div>
 
                       <div className="p-4 bg-slate-50/50 border-t border-slate-100 text-center">

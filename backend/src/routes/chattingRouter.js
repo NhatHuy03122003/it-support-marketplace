@@ -3,7 +3,7 @@ import { getConversations, getMessages, sendMessage } from '../controllers/chatt
 
 const router = express.Router();
 
-router.get('/conversations',getConversations);
+router.get('/conversations/:userId',getConversations);
 router.get('/messages/:conversationId',getMessages);
 router.post('/send',sendMessage);
 

@@ -4,8 +4,6 @@ import Message from "../models/Message.js";
 export const sendMessage = async (req, res) => {
   try {
     const { senderId, recipientId, content } = req.body;
-    console.log("Send: ",req.body);
-    
     if (!senderId || !recipientId || !content) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -38,7 +36,9 @@ export const sendMessage = async (req, res) => {
 
 export const getConversations = async (req, res) => {
   try {
-    const userId = "6a03496a96efda352bec98d5";
+    const {userId} = req.params;
+    
+    
     if (!userId) {
       return res.status(400).json({ message: "Missing userId parameter" });
     }
@@ -46,12 +46,12 @@ export const getConversations = async (req, res) => {
     const conversations = await Conversation.find({
       participants: userId,
     })
-      .populate("participants", "fullname email")
+      .populate("participants", "fullname email status role")
       .populate({
         path: "lastMessage",
-        populate: { path: "sender", select: "fullname email" },
+        populate: { path: "sender", select: "fullname email status role" },
       })
-      .populate({path:'lastMessage', populate: { path: "recipient", select: "fullname email" }});
+      .populate({path:'lastMessage', populate: { path: "recipient", select: "fullname email status role" }});
     return res.status(200).json(conversations);
   } catch (error) {
     console.error("Error in getConversations:", error);
@@ -68,8 +68,8 @@ export const getMessages = async(req,res)=>{
         // find messages for the conversation and populate sender details
         const messages = await Message.find({
             conversation: conversationId,
-        }).populate("sender", "fullname email")
-        .populate({path:'recipient', select: "fullname email"});
+        }).populate("sender", "fullname email status role")
+        .populate({path:'recipient', select: "fullname email status role"});
         return res.status(200).json(messages);
     }catch(error){
         console.error("Error in getMessages:", error);

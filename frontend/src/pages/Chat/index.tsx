@@ -1,13 +1,14 @@
-import useChatting from "./useChatting";
+
 import { Header } from "../../components/layout/Header";
-import ConversationList from "./components/ConversationList";
-import ChatArea from "./components/ChatArea";
+import ConversationList from "./components/Conversation/ConversationList";
+import ChatArea from "./components/ChatArea/ChatArea";
+import useChatting from "../../hooks/useChatting";
 
 export default function Chat() {
   const {
-    userData,
+    user,
     handleSendMessage,
-    activeConv,
+    currentConversation,
     inputValue,
     setInputValue,
     showMobileSidebar,
@@ -17,6 +18,7 @@ export default function Chat() {
     messages,
     inputValueRef,
     focusChatInput,
+    infoUserOther
   } = useChatting();
 
   return (
@@ -27,30 +29,31 @@ export default function Chat() {
         {/* Left Sidebar */}
         <ConversationList
           conversations={conversations}
-          activeConv={activeConv}
+          activeConv={currentConversation!}
+          userData={user!}
           showMobileSidebar={showMobileSidebar}
-          handleSelectConversation={() => handleSelectConversation(activeConv!)}
+          handleSelectConversation={()=>{handleSelectConversation}}
           setShowMobileSidebar={setShowMobileSidebar}
         />
 
         {/* Chat Area */}
-        {activeConv ? (
+        {currentConversation ? (
           <ChatArea
             messages={messages}
             inputValue={inputValue}
             setInputValue={setInputValue}
             handleSendMessage={() =>
-              handleSendMessage(activeConv.participants[1]._id)
+              handleSendMessage(infoUserOther!._id)
             }
             inputValueRef={inputValueRef}
             focusChatInput={focusChatInput}
-            activeConv={activeConv}
-            userData={userData}
+            activeConv={currentConversation}
+            userData={user}
           />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center gap-4">
             <span className="text-sm text-slate-400">
-              Select a conversation to start chatting
+              Hãy tạo một cuộc hội thoại để bắt đầu trao đổi
             </span>
           </div>
         )}
