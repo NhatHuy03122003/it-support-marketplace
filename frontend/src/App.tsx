@@ -4,6 +4,7 @@ import RegistrationPage from "./pages/auth/Register/Register";
 import Layout from "./components/layout/AuthLayout";
 import HomePage from "./pages/home/Home";
 import { Toaster } from "sonner";
+import Chat from "./pages/Chat";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           path="/register"
           element={<Layout children={<RegistrationPage />} />}
         />
+        <Route path="/chat" element={<Chat/>} />
       </Routes>
     </>
   );

@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 app.use("/api/chat", chattingRoute);
 // private routes
-app.use(protectedRoute);
+// app.use(protectedRoute);
 
 connectDB().then(() => {
     // Start server
@@ -32,3 +32,4 @@ connectDB().then(() => {
         console.log(`Server running at http://localhost:${PORT}`);
     });
 });
+

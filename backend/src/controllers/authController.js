@@ -82,6 +82,7 @@ export const signIn = async (req, res) => {
             {
                 userId: user._id,
                 role: user.role,
+                fullname:user.fullname,
                 status: user.status
             },
             process.env.ACCESS_TOKEN_SECRET,

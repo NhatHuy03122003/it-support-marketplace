@@ -1,7 +1,6 @@
 import express from 'express';
-import { getConversations } from '../controllers/chattingController';
-import { getMessages } from '../controllers/chattingController';
-import { sendMessage } from '../controllers/chattingController';
+import { getConversations, getMessages, sendMessage } from '../controllers/chattingController.js';
+
 const router = express.Router();
 
 router.get('/conversations',getConversations);

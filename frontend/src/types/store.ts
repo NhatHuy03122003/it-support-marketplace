@@ -1,3 +1,5 @@
+import type { Message } from "../pages/Chat/model";
+import type { ChatMessage, Conversation } from "./chatting";
 import type { User } from "./user";
 
 export interface LoginFormData {
@@ -35,3 +37,17 @@ export interface AuthState {
     signIn: (email: string, password: string, rememberMe: boolean) => Promise<void>;
     signOut: () => Promise<void>;
 }
+
+export interface ChatState {
+    conversations: Conversation[];
+    currentConversation: Conversation | null;
+    messages: ChatMessage[];
+    loadingConversations: boolean;
+    loadingMessages: boolean;
+    error: string | null;
+
+    getConversations: () => Promise<Conversation[]>;
+    getMessages: (conversationId: string) => Promise<ChatMessage[]>;
+    sendMessage: (senderId:string,recipientId:string, content: string) => Promise<void>;
+}
+
