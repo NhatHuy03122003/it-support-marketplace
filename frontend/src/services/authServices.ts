@@ -24,7 +24,62 @@ export const authServices = {
         );
         return response.data;
     },
+
     signOut: async () => {
         await api.post("/auth/signout", {}, { withCredentials: true });
-    }
+    },
+
+    SignInWithGoogle: async (token: string) => {
+        const response = await api.post(
+            "/auth/google",
+            null,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true
+            }
+        );
+        return response.data;
+    },
+
+    sendOtp: async (email: string) => {
+        const response = await api.post(
+            "/auth/send-otp",
+            { email },
+            { withCredentials: true }
+        );
+
+        return response.data;
+    },
+
+    verifyOtp: async (email: string, otp: string) => {
+        const response = await api.post(
+            "/auth/verify-otp",
+            { email, otp },
+            { withCredentials: true }
+        );
+
+        return response.data;
+    },
+
+    resetPassword: async (
+        email: string,
+        otp: string,
+        newPassword: string
+    ) => {
+        const response = await api.post(
+            "/auth/reset-password",
+            {
+                email,
+                otp,
+                password: newPassword,
+            },
+            { withCredentials: true }
+        );
+
+        return response.data;
+    },
+
+
 }

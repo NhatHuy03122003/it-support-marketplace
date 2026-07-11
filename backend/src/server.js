@@ -23,7 +23,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 
 // private routes
-app.use(protectedRoute);
+// app.use(protectedRoute);
 
 connectDB().then(() => {
     // Start server

@@ -33,5 +33,20 @@ export interface AuthState {
     ) => Promise<void>;
 
     signIn: (email: string, password: string, rememberMe: boolean) => Promise<void>;
-    signOut: () => Promise<void>;
+    logOut: () => Promise<void>;
+
+    sendOtp: (email: string) => Promise<boolean>;
+
+    verifyOtp: (
+        email: string,
+        otp: string
+    ) => Promise<boolean>;
+
+    resetPassword: (
+        email: string,
+        otp: string,
+        newPassword: string
+    ) => Promise<boolean>;
+
+
 }
