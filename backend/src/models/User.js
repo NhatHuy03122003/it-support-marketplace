@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
         },
         hashedPassword: {
             type: String,
-            required: true,
+            required: false,
         },
         email: {
             type: String,
@@ -44,6 +44,18 @@ const userSchema = new mongoose.Schema(
             type: String,
             sparse: true
         },
+        otp: {
+            type: String,
+            default: null
+        },
+        otpExpires: {
+            type: Date,
+            default: null
+        },
+        isVerified: {
+            type: Boolean,
+            default: false,
+        }
 
     },
     { timestamps: true }
