@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, SquarePlus } from "lucide-react";
 import { motion } from "motion/react";
-import GOOGLE from "../../../assets/google.png";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, type SignInFormValues } from "./signin-form";
 import { useAuthStore } from "../../../stores/useAuthStore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { SignInWithGoogle } from "../LoginWithGoogle/signInWithGoogle";
 
 export default function App() {
   const [showPassword, setShowPassword] = useState(false);
@@ -116,32 +116,30 @@ export default function App() {
 
           {/* Remember Me & Recover */}
           <div className="flex items-center justify-between py-1">
-            <div>
-              <label className="flex items-center space-x-2 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/20 transition-all cursor-pointer"
-                  {...register("rememberMe")}
-                />
-                <span className="text-[13px] font-medium text-gray-600 group-hover:text-gray-800 transition-colors select-none">
-                  Ghi nhớ tôi
-                </span>
-              </label>
-              <div className="min-h-[20px]">
-                {errors.rememberMe && (
-                  <p className="text-red-500 text-sm">
-                    {errors.rememberMe.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <a
-              href="#"
+            <label className="flex items-center space-x-2 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/20 transition-all cursor-pointer"
+                {...register("rememberMe")}
+              />
+              <span className="text-[13px] font-medium text-gray-600 group-hover:text-gray-800 transition-colors select-none">
+                Ghi nhớ tôi
+              </span>
+            </label>
+            <Link
+              to="/forgot-password"
               className="text-[13px] font-bold text-black hover:underline transition-all"
             >
               Quên mật khẩu?
-            </a>
+            </Link>
           </div>
+          {errors.rememberMe && (
+            <div className="min-h-[20px]">
+              <p className="text-red-500 text-sm">
+                {errors.rememberMe.message}
+              </p>
+            </div>
+          )}
 
           {/* Submit Button */}
           <motion.button
@@ -167,19 +165,7 @@ export default function App() {
           </div>
         </div>
         {/* Social Logins */}
-        <div className="space-y-3">
-          <button className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors active:scale-95 duration-200 group">
-            <img
-              src={GOOGLE}
-              alt="Google"
-              className="w-5 h-5 object-contain"
-              referrerPolicy="no-referrer"
-            />
-            <span className="text-[13px] font-bold text-black group-hover:text-primary transition-colors">
-              Google
-            </span>
-          </button>
-        </div>
+        <SignInWithGoogle />
 
         {/* Register Redirect */}
         <div className="mt-6 text-center">

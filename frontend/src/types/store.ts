@@ -35,22 +35,20 @@ export interface AuthState {
     ) => Promise<void>;
 
     signIn: (email: string, password: string, rememberMe: boolean) => Promise<void>;
-    signOut: () => Promise<void>;
-}
+    logOut: () => Promise<void>;
 
-export interface ChatState {
-    conversations: Conversation[];
-    currentConversation: Conversation | null;
-    messages: Message[];
-    loadingConversations: boolean;
-    loadingMessages: boolean;
-    error: string | null;
-    getConversations: (userId:string) => Promise<Conversation[]>;
-    getMessages: (conversationId: string) => Promise<Message[]>;
-    sendMessage: (senderId:string,recipientId:string, content: string) => Promise<void>;
-    connectSocket: (userId:string)=>void;
-    disconnectSocket: ()=>void;
-    joinConversation: (convId:string)=>void;
-    addMessage: (msg: Message) => void;
-}
+    sendOtp: (email: string) => Promise<boolean>;
 
+    verifyOtp: (
+        email: string,
+        otp: string
+    ) => Promise<boolean>;
+
+    resetPassword: (
+        email: string,
+        otp: string,
+        newPassword: string
+    ) => Promise<boolean>;
+
+
+}

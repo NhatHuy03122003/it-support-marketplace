@@ -24,8 +24,12 @@ export default function RegistrationForm() {
       const backendRole = role === "client" ? "customer" : role;
 
       await signUp(fullname, password, email, phone, backendRole);
-      // Only navigate if registration succeeds
-      navigate("/login");
+      
+      // Lưu email vào localStorage để dùng ở trang check email
+      localStorage.setItem("verifyEmail", email);
+      
+      // Chuyển đến trang check email sau khi đăng ký thành công
+      navigate("/check-email");
     } catch (error) {
       console.error("Registration failed:", error);
       // Don't navigate on error - user stays on registration page

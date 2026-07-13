@@ -1,3 +1,4 @@
+import { Menu, BriefcaseMedical } from "lucide-react";
 import {
   Bell,
   MessageSquare,
@@ -9,6 +10,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/useAuthStore";
 import { toast } from "sonner";
+import { signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase";
+
+export function Header() {
+  const { logOut } = useAuthStore();
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useChattingStore } from "../../stores/useChattingStore";
@@ -47,7 +53,8 @@ export function Header({ onOpenChat }: { onOpenChat: () => void }) {
   };
   const handleLogout = async () => {
     try {
-      await signOut();
+      await logOut();
+      await signOut(auth)
       navigate("/login");
       toast.success("Đăng xuất thành công!");
     } catch (error) {
