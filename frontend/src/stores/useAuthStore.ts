@@ -3,8 +3,10 @@ import { toast } from "sonner";
 import { authServices } from "../services/authServices";
 import type { AuthState } from "../types/store";
 import axios from "axios";
-
-export const useAuthStore = create<AuthState>((set, get) => ({
+import {persist} from "zustand/middleware";
+import {jwtDecode} from "jwt-decode";
+import type { UserData } from "../types/user";
+export const useAuthStore = create<AuthState>()(persist((set, get) => ({
   accessToken: null,
   user: null,
   loading: false,
@@ -63,6 +65,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (rememberMe) {
         localStorage.setItem("token", accessToken);
       }
+      set({ user: jwtDecode(accessToken) as UserData });
       toast.success("Đăng nhập thành công!");
     } catch (error) {
       console.log(error);
@@ -134,4 +137,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: false });
     }
   },
-}));
+}),
+   {
+      name: "auth-storage", // key trong localStorage
+      partialize: (state) => ({
+        accessToken: state.accessToken,
+        user: state.user,
+      }),
+    },
+));

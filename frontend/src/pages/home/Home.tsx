@@ -7,7 +7,7 @@ import { Footer } from "../../components/layout/Footer";
  function HomePage() {
   return (
     <div className="min-h-screen font-sans text-slate-900">
-      <Header />
+      <Header onOpenChat={()=>{}} />
       <main>
         <Hero />
         <Services />
